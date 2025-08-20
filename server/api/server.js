@@ -12,25 +12,26 @@ const app = express();
 // MongoDB connection (serverless-friendly)
 let isConnected = false;
 
+// Connect once at startup
 const connectDBServerless = async () => {
   if (!isConnected) {
-    await connectDB();
-    isConnected = true;
+    try {
+      await connectDB();
+      isConnected = true;
+      console.log("MongoDB connected");
+    } catch (err) {
+      console.error("MongoDB connection failed:", err);
+    }
   }
 };
+
+// Start DB connection without blocking requests
+connectDBServerless();
 
 // Middleware
 app.use(express.json());
 app.use(cors({ credentials: true }));
 app.use(cookieParser());
-
-// Ensure DB is connected before any request
-app.use(async (req, res, next) => {
-  if (!isConnected) {
-    await connectDBServerless();
-  }
-  next();
-});
 
 // Routes
 app.use("/api/auth", authRoutes);
