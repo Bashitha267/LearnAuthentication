@@ -15,6 +15,12 @@ app.use(cookieParser());
 app.listen(port,()=>{
     console.log(`Port is running on :${port}`)
 })
+app.head("/ping", (req, res) => {
+  res.status(200).json({ status: "OK"});
+})
+app.get("/ping", (req, res) => {
+  res.status(200).json({ status: "OK" });
+})
 //MONGO DB connection
 connectDB()
 //API End points
