@@ -38,5 +38,5 @@ app.get("/", (req, res) => {
   res.send("API Working fine");
 });
 
-// Serverless handler
-export const handler = serverless(app);
+// ✅ Default export for Vercel
+export default serverless(app);
