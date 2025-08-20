@@ -140,3 +140,20 @@ export const verifyEmail=async(req,res)=>{
     await user.save();
     return res.json({success:true,message:"Account Successfully Verfied"})
 }
+export const getUser=async (req,res)=>{
+    try{
+ const {email}=req.params;
+    if(!email){
+        return res.json({message:"User not found"})
+    }
+    const user=await userModel.findOne({email})
+    if(!user){
+        return res.json({message:"User not found"})
+    }
+    return res.json({"name":user.name,"email":user.email,"isVerified":user.isVerified,"role":user.role})
+    }
+    catch(e){
+        console.log(e)
+    }
+   
+}
