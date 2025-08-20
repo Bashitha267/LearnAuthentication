@@ -5,18 +5,26 @@ import express from "express";
 import serverless from "serverless-http";
 import connectDB from "../config/mongodb.js";
 import authRoutes from '../routes/authRoutes.js';
-const app=express();
-const port=process.env.PORT||4000;
-//middleware
+
+const app = express();
+
+// Middleware
 app.use(express.json());
-app.use(cors({credentials:true}));
+app.use(cors({ credentials: true }));
 app.use(cookieParser());
 
-//function
-// app.listen(port,()=>{
-//     console.log(`Port is running on :${port}`)
-// })
-//MONGO DB connection
+// Routes
+app.use('/api/auth', authRoutes);
+app.get('/', (req, res) => {
+  res.send("API Working fine");
+});
+
+// Serverless handler
+export const handler = serverless(app);
+
+// MongoDB connection (serverless-friendly)
+let isConnected = false; // cache connection across invocations
+
 const connectDBServerless = async () => {
   if (!isConnected) {
     try {
@@ -29,11 +37,11 @@ const connectDBServerless = async () => {
     }
   }
 };
-//API End points
-app.use('/api/auth',authRoutes)
-app.get('/',(req,res)=>{
-        res.send("API Working fine")
-})
-export const handler = serverless(app);
 
-
+// Wrap routes in a middleware to ensure DB is connected
+app.use(async (req, res, next) => {
+  if (!isConnected) {
+    await connectDBServerless();
+  }
+  next();
+});
